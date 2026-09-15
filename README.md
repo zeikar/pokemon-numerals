@@ -1,6 +1,8 @@
 # Pokémon Numerals
 
-What if numbers were Pokémon?
+What if numbers were Pokémon? **[Try it →](https://zeikar.dev/pokemon-numerals/)**
+
+![The clock ticking from Bulbasaur : Charmander : Ekans onward, switching to decimal and back](assets/demo.gif)
 
 In Pokémon Numerals, an integer *n* is written as the Pokémon whose National Pokédex number is *n*. Zero is MissingNo., and anything above the last Pokédex number is written positionally in base (last number + 1).
 
