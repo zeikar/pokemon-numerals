@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pokémon Numerals</title>
+  <meta name="description" content="What if numbers were Pokémon? A numeral system where n is written as the Pokémon with National Pokédex number n.">
+  <link rel="icon" href="assets/missingno.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=STIX+Two+Text:ital,wght@0,400..700;1,400..700&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Pokémon Numerals</h1>
+      <p class="tagline">What if numbers were Pokémon?</p>
+    </header>
+
+    <section class="device" aria-label="Clock">
+      <div class="bezel">
+        <div class="lcd">
+          <p class="readout readout--date" id="date"></p>
+          <p class="readout readout--time" id="time"></p>
+        </div>
+      </div>
+
+      <div class="controls">
+        <fieldset class="keys">
+          <legend class="visually-hidden">Numeral system</legend>
+          <label class="key"><input type="radio" name="system" value="10"><span>Decimal</span></label>
+          <label class="key"><input type="radio" name="system" value="2"><span>Binary</span></label>
+          <label class="key"><input type="radio" name="system" value="16"><span>Hexadecimal</span></label>
+          <label class="key"><input type="radio" name="system" value="pokemon" checked><span>Pokémon</span></label>
+        </fieldset>
+        <label class="key"><input type="checkbox" id="hardcore"><span>Hardcore mode</span></label>
+      </div>
+    </section>
+
+    <section class="convert" aria-labelledby="convert-title">
+      <h2 id="convert-title"><label for="number">Convert a number</label></h2>
+      <input id="number" type="text" value="1026" maxlength="40" autocomplete="off" spellcheck="false">
+      <div class="bezel bezel--small">
+        <div class="lcd">
+          <p class="readout readout--convert" id="converted" aria-live="polite"></p>
+        </div>
+      </div>
+      <p class="note" id="note" aria-live="polite"></p>
+    </section>
+
+    <section class="definition" aria-labelledby="definition-title">
+      <h2 id="definition-title">Definition</h2>
+      <p>In Pokémon Numerals, an integer <var>n</var> is represented by the Pokémon whose National Pokédex number is <var>n</var>.</p>
+      <p>Zero is represented by MissingNo., which Pokémon Red and Blue list as No.&nbsp;000.</p>
+      <p>Integers greater than <span data-max>1025</span> are written positionally in base <span data-base>1026</span>, with MissingNo. as the zero digit. Negative integers take a minus sign.</p>
+      <p>The base increases with each new generation. Backwards compatibility is not guaranteed.</p>
+      <p>Practical applications have not been observed.</p>
+    </section>
+
+    <footer>
+      <p>An unofficial fan project, not affiliated with Nintendo, Creatures, GAME FREAK or The Pokémon Company. Names and sprites come from <a href="https://pokeapi.co/">PokéAPI</a>.</p>
+      <p><a href="https://github.com/zeikar/pokemon-numerals">Source on GitHub</a></p>
+    </footer>
+  </main>
+</body>
+</html>

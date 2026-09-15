@@ -1,0 +1,9 @@
+{
+  "name": "pokemon-numerals",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "data": "node scripts/build-data.js"
+  }
+}
