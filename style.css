@@ -127,13 +127,13 @@ var {
 }
 
 .readout--time {
-  --sprite: clamp(96px, 27vw, 192px);
-  min-height: calc(var(--sprite) * 0.8 + 2rem);
-  font-size: clamp(48px, 16vw, 120px);
+  --sprite: clamp(64px, 20vw, 168px);
+  min-height: calc(var(--sprite) * 0.8 + 0.5rem);
+  font-size: clamp(40px, 13vw, 104px);
 }
 
 .readout--convert {
-  min-height: calc(var(--sprite) * 0.8 + 2rem);
+  min-height: calc(var(--sprite) * 0.8 + 0.5rem);
 }
 
 .readout:not([data-system="pokemon"]) {
@@ -142,7 +142,7 @@ var {
 }
 
 .readout--time[data-system="2"] {
-  font-size: clamp(24px, 6.5vw, 52px);
+  font-size: clamp(18px, 4.6vw, 40px);
 }
 
 .readout--date[data-system="2"] {
@@ -150,13 +150,9 @@ var {
 }
 
 @media (max-width: 30rem) {
-  /* Four named sprites don't fit a phone-width row; keep only the dex numbers. */
+  /* Four sprites and two separators overflow a phone-width row at 64px. */
   .readout--date {
     --sprite: 52px;
-  }
-
-  .readout--date .name {
-    display: none;
   }
 }
 
@@ -177,16 +173,14 @@ var {
 }
 
 .readout[data-system="pokemon"] .separator {
-  /* Center on the sprites, not on sprites plus labels. */
+  /* Center on the artwork of a single row of sprites. */
   align-self: flex-start;
   margin-top: calc(var(--sprite) * 0.42 - 0.5em);
   font-size: calc(var(--sprite) * 0.35);
 }
 
 .digit {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  position: relative;
   margin: 0;
 }
 
@@ -194,27 +188,62 @@ var {
   display: block;
   width: var(--sprite);
   height: var(--sprite);
-  /* PokéAPI sprites sit in a padded 96px canvas; pull the label up to the artwork. */
+  /* PokéAPI sprites sit in a padded 96px canvas; trim it so rows hug the artwork. */
   margin-block: calc(var(--sprite) * -0.08) calc(var(--sprite) * -0.12);
   image-rendering: pixelated;
 }
 
+.negative img {
+  transform: scaleY(-1);
+}
+
+/* Labels stay out of the way until a sprite is hovered, or tapped on touch screens. */
 .label {
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 50%;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  gap: 0.4em;
+  padding: 4px 6px 3px;
+  border-radius: 2px;
+  background: var(--lcd-ink);
+  color: var(--lcd);
   font-size: 12px;
-  line-height: 1.3;
-  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  visibility: hidden;
+}
+
+@media (hover: hover) {
+  .digit:hover .label {
+    visibility: visible;
+  }
+}
+
+.digit.show-label .label {
+  visibility: visible;
 }
 
 .dex {
   opacity: 0.7;
 }
 
-/* Hardcore mode: sprites only. */
+/* Hardcore mode: silhouettes only, with no labels or formula to give it away. */
+body:has(#hardcore:checked) .digit img {
+  filter: brightness(0) opacity(0.8);
+}
+
 body:has(#hardcore:checked) :is(.label, .formula) {
   visibility: hidden;
+}
+
+/* Clock colons blink off for the second half of each second. */
+@media (prefers-reduced-motion: no-preference) {
+  .readout--time.colons-off .separator {
+    visibility: hidden;
+  }
 }
 
 /* Keys */

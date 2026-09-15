@@ -65,22 +65,25 @@ function separator(text) {
   return el;
 }
 
+// Replaces only the fields whose value changed, so unchanged sprites aren't rebuilt every second.
 function renderReadout(el, fields, sep, system) {
   el.dataset.system = system;
-  el.replaceChildren(...fields.flatMap(({ value, max }, i) => [
-    ...(i > 0 ? [separator(sep)] : []),
-    numeral(BigInt(value), system, max),
-  ]));
+  if (el.children.length !== fields.length * 2 - 1) {
+    el.replaceChildren(...fields.flatMap((_, i) => [...(i > 0 ? [separator(sep)] : []), element('span')]));
+  }
+  fields.forEach(({ value, max }, i) => {
+    const current = el.children[i * 2];
+    const key = `${system}:${value}`;
+    if (current.dataset.key === key) return;
+    const next = numeral(BigInt(value), system, max);
+    next.dataset.key = key;
+    current.replaceWith(next);
+  });
 }
-
-let renderedClock = '';
 
 function renderClock() {
   const now = new Date();
   const system = currentSystem();
-  const key = [system, now.toDateString(), now.getHours(), now.getMinutes()].join('|');
-  if (key === renderedClock) return;
-  renderedClock = key;
 
   renderReadout(dateEl, [
     { value: now.getFullYear() },
@@ -90,7 +93,16 @@ function renderClock() {
   renderReadout(timeEl, [
     { value: now.getHours(), max: 23 },
     { value: now.getMinutes(), max: 59 },
+    { value: now.getSeconds(), max: 59 },
   ], ':', system);
+}
+
+// Aligned to the start of each second; a plain 1s interval drifts and can skip a second.
+function tick() {
+  renderClock();
+  timeEl.classList.remove('colons-off');
+  setTimeout(() => timeEl.classList.add('colons-off'), 500);
+  setTimeout(tick, 1000 - (Date.now() % 1000));
 }
 
 function formula(value, digits, negative) {
@@ -120,7 +132,13 @@ function renderConverter() {
   const negative = n < 0n;
   const value = negative ? -n : n;
   const el = numeral(value, system);
-  if (negative) el.prepend(element('span', 'separator', '−')); // inside the numeral so the sign wraps with it
+  if (negative && system === 'pokemon') {
+    // Pokémon Numerals write negatives upside down instead of with a sign.
+    el.classList.add('negative');
+    el.prepend(element('span', 'visually-hidden', 'minus'));
+  } else if (negative) {
+    el.prepend(element('span', 'separator', '−')); // inside the numeral so the sign wraps with it
+  }
   convertedEl.replaceChildren(el);
 
   const digits = toDigits(value, base);
@@ -152,6 +170,14 @@ document.querySelectorAll('input[name="system"]').forEach((radio) => {
 });
 input.addEventListener('input', renderConverter);
 
-renderClock();
+// Touch screens have no hover, so tapping a sprite toggles its label; tapping elsewhere closes it.
+document.addEventListener('click', (event) => {
+  const tapped = event.target.closest('.digit');
+  document.querySelectorAll('.digit.show-label').forEach((el) => {
+    if (el !== tapped) el.classList.remove('show-label');
+  });
+  tapped?.classList.toggle('show-label');
+});
+
+tick();
 renderConverter();
-setInterval(renderClock, 1000);
