@@ -123,6 +123,7 @@ var {
 
 .readout--date {
   --sprite: 64px;
+  min-height: calc(var(--sprite) * 0.8);
   font-size: 24px;
 }
 
