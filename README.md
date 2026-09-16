@@ -34,3 +34,7 @@ GitHub Pages: Settings → Pages → Deploy from a branch → `main` / root.
 ## Credits
 
 Pokémon names and sprites come from [PokéAPI](https://pokeapi.co/). This is an unofficial fan project, not affiliated with Nintendo, Creatures, GAME FREAK or The Pokémon Company.
+
+## License
+
+The code is released under the [MIT License](LICENSE). Pokémon names and sprites, including those shown in the screenshots, are not covered and belong to their respective owners.
