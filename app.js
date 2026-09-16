@@ -9,6 +9,7 @@ const input = document.getElementById('number');
 const convertedEl = document.getElementById('converted');
 const noteEl = document.getElementById('note');
 const generationSelect = document.getElementById('generation');
+const hardcoreInput = document.getElementById('hardcore');
 
 let pokemon = []; // pokemon[i] is No. i + 1
 let generations = []; // generations[g - 1] is the last Pokédex number of generation g
@@ -154,14 +155,15 @@ function setBase() {
   document.querySelectorAll('[data-base]').forEach((el) => { el.textContent = base; });
 }
 
-// Mirrors the converter and generation into the address, so the current view can be shared.
+// Mirrors the converter, generation and hardcore mode into the address (keeping #clock), so the view can be shared.
 // Debounced because Safari throws after 100 replaceState calls in 10 seconds, which fast typing can reach.
 let urlTimer;
 function updateUrl() {
   clearTimeout(urlTimer);
   urlTimer = setTimeout(() => {
     const query = new URLSearchParams({ n: input.value, gen: generationSelect.selectedIndex + 1 });
-    history.replaceState(null, '', `?${query}`);
+    if (hardcoreInput.checked) query.set('hardcore', '1');
+    history.replaceState(null, '', `?${query}${location.hash}`);
   }, 300);
 }
 
@@ -175,12 +177,13 @@ try {
   throw error;
 }
 
-// A shared link like ?n=2026&gen=1 presets the converter and generation; otherwise Gen 1 is used.
+// A shared link like ?n=2026&gen=1&hardcore=1 presets the converter, generation and hardcore mode; otherwise Gen 1 is used.
 const params = new URLSearchParams(location.search);
 const gen = Number(params.get('gen'));
 generationSelect.append(...generations.map((last, i) => new Option(`Gen ${i + 1}`, last + 1)));
 generationSelect.selectedIndex = generations[gen - 1] ? gen - 1 : 0;
 if (params.has('n')) input.value = params.get('n').slice(0, input.maxLength);
+hardcoreInput.checked = params.get('hardcore') === '1';
 setBase();
 
 // Warm the cache for every minute so the clock never flashes an empty sprite.
@@ -202,6 +205,9 @@ input.addEventListener('input', () => {
   renderConverter();
   updateUrl();
 });
+hardcoreInput.addEventListener('change', updateUrl);
+// Back and Forward between the main and #clock views can land on an entry written before the latest change.
+window.addEventListener('popstate', updateUrl);
 
 // Touch screens have no hover, so tapping a sprite toggles its label; tapping elsewhere closes it.
 document.addEventListener('click', (event) => {

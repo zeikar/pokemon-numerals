@@ -278,13 +278,15 @@ body:has(#hardcore:checked) :is(.label, .formula) {
 }
 
 .key span,
-.key select {
+.key select,
+a.key {
   display: block;
   padding: 0.6rem 0.95rem 0.5rem;
   border-radius: 999px;
   background: var(--key);
   box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.16);
   font: 12px/1 var(--pixel);
+  text-decoration: none;
   cursor: pointer;
   user-select: none;
 }
@@ -320,7 +322,8 @@ body:has(#hardcore:checked) :is(.label, .formula) {
 }
 
 .key input:focus-visible + span,
-.key select:focus-visible {
+.key select:focus-visible,
+a.key:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
@@ -377,4 +380,52 @@ footer {
 
 footer p {
   margin: 0 0 0.5rem;
+}
+
+/* Clock only: #clock in the address hides everything but a full-screen LCD. */
+
+body:has(#clock:target) {
+  background: var(--lcd);
+}
+
+body:has(#clock:target) main {
+  max-width: none;
+  padding: 0;
+}
+
+body:has(#clock:target) main > :not(#clock),
+body:has(#clock:target) .controls {
+  display: none;
+}
+
+body:has(#clock:target) .bezel {
+  padding: 0;
+  border-radius: 0;
+}
+
+body:has(#clock:target) .lcd {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6dvh;
+  min-height: 100dvh;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* Text systems scale with the sprite size too; binary needs more room per value. */
+body:has(#clock:target) .readout {
+  font-size: calc(var(--sprite) * 0.6);
+}
+
+body:has(#clock:target) .readout[data-system="2"] {
+  font-size: calc(var(--sprite) * 0.25);
+}
+
+body:has(#clock:target) .readout--date {
+  --sprite: min(16vw, 18dvh);
+}
+
+body:has(#clock:target) .readout--time {
+  --sprite: min(22vw, 48dvh);
 }
