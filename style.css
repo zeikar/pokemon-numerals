@@ -382,39 +382,56 @@ footer p {
   margin: 0 0 0.5rem;
 }
 
-/* Clock only: #clock in the address hides everything but a full-screen LCD. */
-
-body:has(#clock:target) {
-  background: var(--lcd);
-}
+/* Clock only: #clock in the address shows just the device, scaled up like a desk clock. */
 
 body:has(#clock:target) main {
+  --device: min(92vw, 160dvh);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: calc(var(--device) * 0.02);
+  min-height: 100dvh;
   max-width: none;
   padding: 0;
 }
 
-body:has(#clock:target) main > :not(#clock),
-body:has(#clock:target) .controls {
+body:has(#clock:target) main > :not(#clock, header),
+body:has(#clock:target) :is(.tagline, .controls) {
   display: none;
 }
 
+/* The title moves under the screen, lined up with the LCD, where a handheld prints its name. */
+body:has(#clock:target) header {
+  order: 1;
+  justify-self: start;
+  padding-left: calc(var(--device) * 0.05);
+}
+
+body:has(#clock:target) h1 {
+  font-size: max(14px, calc(var(--device) * 0.028));
+}
+
+body:has(#clock:target) .device {
+  container-type: inline-size;
+  width: var(--device);
+}
+
 body:has(#clock:target) .bezel {
-  padding: 0;
-  border-radius: 0;
+  padding: 4cqi 5cqi;
+  border-radius: 1.5cqi 1.5cqi 9cqi 1.5cqi;
 }
 
 body:has(#clock:target) .lcd {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 6dvh;
-  min-height: 100dvh;
-  border-radius: 0;
-  box-shadow: none;
+  gap: 1cqi;
+  padding: 3.5cqi 3cqi;
+  border-radius: 0.5cqi;
 }
 
-/* Text systems scale with the sprite size too; binary needs more room per value. */
+/* Text systems scale with the sprites; binary needs more room per value. */
 body:has(#clock:target) .readout {
+  padding-block: 0;
   font-size: calc(var(--sprite) * 0.6);
 }
 
@@ -422,10 +439,33 @@ body:has(#clock:target) .readout[data-system="2"] {
   font-size: calc(var(--sprite) * 0.25);
 }
 
+body:has(#clock:target) .numeral {
+  column-gap: 0.5cqi;
+}
+
+/* Sprites sit in padded canvases; trim the sides as well, so the separators set the rhythm. */
+body:has(#clock:target) .digit img {
+  margin-inline: calc(var(--sprite) * -0.14);
+}
+
+body:has(#clock:target) .readout[data-system="pokemon"] .separator {
+  padding-inline: calc(var(--sprite) * 0.04);
+  font-size: calc(var(--sprite) * 0.5);
+}
+
 body:has(#clock:target) .readout--date {
-  --sprite: min(16vw, 18dvh);
+  --sprite: max(9cqi, 44px);
+}
+
+body:has(#clock:target) .readout--date[data-system="pokemon"] .separator {
+  padding-inline: calc(var(--sprite) * 0.2);
 }
 
 body:has(#clock:target) .readout--time {
-  --sprite: min(22vw, 48dvh);
+  --sprite: 30cqi;
+  font-size: calc(var(--sprite) * 0.48);
+}
+
+body:has(#clock:target) .readout--time[data-system="2"] {
+  font-size: calc(var(--sprite) * 0.2);
 }
