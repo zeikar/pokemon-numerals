@@ -154,6 +154,17 @@ function setBase() {
   document.querySelectorAll('[data-base]').forEach((el) => { el.textContent = base; });
 }
 
+// Mirrors the converter and generation into the address, so the current view can be shared.
+// Debounced because Safari throws after 100 replaceState calls in 10 seconds, which fast typing can reach.
+let urlTimer;
+function updateUrl() {
+  clearTimeout(urlTimer);
+  urlTimer = setTimeout(() => {
+    const query = new URLSearchParams({ n: input.value, gen: generationSelect.selectedIndex + 1 });
+    history.replaceState(null, '', `?${query}`);
+  }, 300);
+}
+
 try {
   const response = await fetch('data/pokemon.json');
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -164,9 +175,12 @@ try {
   throw error;
 }
 
-// The latest generation is the default.
+// A shared link like ?n=2026&gen=1 presets the converter and generation; otherwise the latest generation is used.
+const params = new URLSearchParams(location.search);
+const gen = Number(params.get('gen'));
 generationSelect.append(...generations.map((last, i) => new Option(`Gen ${i + 1}`, last + 1)));
-generationSelect.selectedIndex = generations.length - 1;
+generationSelect.selectedIndex = generations[gen - 1] ? gen - 1 : generations.length - 1;
+if (params.has('n')) input.value = params.get('n').slice(0, input.maxLength);
 setBase();
 
 // Warm the cache for every minute so the clock never flashes an empty sprite.
@@ -182,8 +196,12 @@ generationSelect.addEventListener('change', () => {
   setBase();
   renderClock();
   renderConverter();
+  updateUrl();
 });
-input.addEventListener('input', renderConverter);
+input.addEventListener('input', () => {
+  renderConverter();
+  updateUrl();
+});
 
 // Touch screens have no hover, so tapping a sprite toggles its label; tapping elsewhere closes it.
 document.addEventListener('click', (event) => {
