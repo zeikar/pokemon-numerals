@@ -6,7 +6,7 @@ What if numbers were Pokémon? **[Try it →](https://zeikar.dev/pokemon-numeral
 
 In Pokémon Numerals, an integer *n* is written as the Pokémon whose National Pokédex number is *n*. Zero is MissingNo., and anything above the last Pokédex number is written positionally in base (last number + 1).
 
-The demo shows a clock, today's date, and a converter, with Decimal, Binary and Hexadecimal alongside for comparison. Hover or tap a sprite to see its Pokédex number and name. Pick an earlier generation to count in its smaller base. The address keeps the converted number and generation, so links like `?n=2026&gen=1` can be shared. Hardcore mode shows only silhouettes.
+The demo shows a clock, today's date, and a converter, with Decimal, Binary and Hexadecimal alongside for comparison. Hover or tap a sprite to see its Pokédex number and name. It counts in Gen 1 by default; pick a later generation for a bigger base. The address keeps the converted number and generation, so links like `?n=2026&gen=1` can be shared. Hardcore mode shows only silhouettes.
 
 ## Run locally
 
@@ -25,7 +25,7 @@ npm test       # numeral conversion tests (Node's built-in test runner)
 npm run data   # regenerate data/pokemon.json from PokéAPI
 ```
 
-Rerun `npm run data` when a new generation is released. The numeral base grows with it.
+Rerun `npm run data` when a new generation is released to add it and its bigger base.
 
 ## Deploy
 

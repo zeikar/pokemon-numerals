@@ -175,11 +175,11 @@ try {
   throw error;
 }
 
-// A shared link like ?n=2026&gen=1 presets the converter and generation; otherwise the latest generation is used.
+// A shared link like ?n=2026&gen=1 presets the converter and generation; otherwise Gen 1 is used.
 const params = new URLSearchParams(location.search);
 const gen = Number(params.get('gen'));
 generationSelect.append(...generations.map((last, i) => new Option(`Gen ${i + 1}`, last + 1)));
-generationSelect.selectedIndex = generations[gen - 1] ? gen - 1 : generations.length - 1;
+generationSelect.selectedIndex = generations[gen - 1] ? gen - 1 : 0;
 if (params.has('n')) input.value = params.get('n').slice(0, input.maxLength);
 setBase();
 

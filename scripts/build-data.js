@@ -1,5 +1,5 @@
 // Regenerates data/pokemon.json from PokéAPI's species tables.
-// Run again when a new generation lands: the numeral base grows with it.
+// Run again when a new generation lands to add it and its bigger base.
 import { mkdir, writeFile } from 'node:fs/promises';
 
 const CSV = 'https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/';
