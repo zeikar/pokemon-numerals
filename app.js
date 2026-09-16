@@ -8,8 +8,10 @@ const timeEl = document.getElementById('time');
 const input = document.getElementById('number');
 const convertedEl = document.getElementById('converted');
 const noteEl = document.getElementById('note');
+const generationSelect = document.getElementById('generation');
 
 let pokemon = []; // pokemon[i] is No. i + 1
+let generations = []; // generations[g - 1] is the last Pokédex number of generation g
 let base = 0n;
 
 function spriteUrl(n) {
@@ -73,7 +75,7 @@ function renderReadout(el, fields, sep, system) {
   }
   fields.forEach(({ value, max }, i) => {
     const current = el.children[i * 2];
-    const key = `${system}:${value}`;
+    const key = `${system}:${base}:${value}`;
     if (current.dataset.key === key) return;
     const next = numeral(BigInt(value), system, max);
     next.dataset.key = key;
@@ -145,19 +147,27 @@ function renderConverter() {
   if (system === 'pokemon' && digits.length > 1) noteEl.append(formula(value, digits, negative));
 }
 
+// Each generation counts in base (its last Pokédex number + 1).
+function setBase() {
+  base = BigInt(generationSelect.value);
+  document.querySelectorAll('[data-max]').forEach((el) => { el.textContent = base - 1n; });
+  document.querySelectorAll('[data-base]').forEach((el) => { el.textContent = base; });
+}
+
 try {
   const response = await fetch('data/pokemon.json');
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  pokemon = await response.json();
+  ({ pokemon, generations } = await response.json());
 } catch (error) {
   console.error('Loading data/pokemon.json failed:', error);
   dateEl.textContent = 'The Pokédex failed to load. Reload the page to try again.';
   throw error;
 }
 
-base = BigInt(pokemon.length + 1);
-document.querySelectorAll('[data-max]').forEach((el) => { el.textContent = pokemon.length; });
-document.querySelectorAll('[data-base]').forEach((el) => { el.textContent = base; });
+// The latest generation is the default.
+generationSelect.append(...generations.map((last, i) => new Option(`Gen ${i + 1}`, last + 1)));
+generationSelect.selectedIndex = generations.length - 1;
+setBase();
 
 // Warm the cache for every minute so the clock never flashes an empty sprite.
 for (let n = 1; n <= 59; n++) new Image().src = spriteUrl(n);
@@ -167,6 +177,11 @@ document.querySelectorAll('input[name="system"]').forEach((radio) => {
     renderClock();
     renderConverter();
   });
+});
+generationSelect.addEventListener('change', () => {
+  setBase();
+  renderClock();
+  renderConverter();
 });
 input.addEventListener('input', renderConverter);
 

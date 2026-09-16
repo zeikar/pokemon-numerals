@@ -6,7 +6,7 @@ What if numbers were Pokémon? **[Try it →](https://zeikar.dev/pokemon-numeral
 
 In Pokémon Numerals, an integer *n* is written as the Pokémon whose National Pokédex number is *n*. Zero is MissingNo., and anything above the last Pokédex number is written positionally in base (last number + 1).
 
-The demo shows a clock, today's date, and a converter, with Decimal, Binary and Hexadecimal alongside for comparison. Hover or tap a sprite to see its Pokédex number and name. Hardcore mode shows only silhouettes.
+The demo shows a clock, today's date, and a converter, with Decimal, Binary and Hexadecimal alongside for comparison. Hover or tap a sprite to see its Pokédex number and name. Pick an earlier generation to count in its smaller base. Hardcore mode shows only silhouettes.
 
 ## Run locally
 

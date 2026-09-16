@@ -277,7 +277,8 @@ body:has(#hardcore:checked) :is(.label, .formula) {
   pointer-events: none;
 }
 
-.key span {
+.key span,
+.key select {
   display: block;
   padding: 0.6rem 0.95rem 0.5rem;
   border-radius: 999px;
@@ -286,6 +287,24 @@ body:has(#hardcore:checked) :is(.label, .formula) {
   font: 12px/1 var(--pixel);
   cursor: pointer;
   user-select: none;
+}
+
+.key select {
+  appearance: none;
+  padding-right: 2rem;
+  border: 0;
+  color: inherit;
+}
+
+/* appearance: none drops the native arrow, so the wrapper draws one. */
+.select::after {
+  content: "▾";
+  position: absolute;
+  top: 50%;
+  right: 0.9rem;
+  font: 12px/1 var(--pixel);
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .key input:checked + span {
@@ -300,7 +319,8 @@ body:has(#hardcore:checked) :is(.label, .formula) {
   }
 }
 
-.key input:focus-visible + span {
+.key input:focus-visible + span,
+.key select:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
