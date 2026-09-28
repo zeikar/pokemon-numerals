@@ -21,6 +21,15 @@ function spriteUrl(n) {
     : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${n}.png`;
 }
 
+// Stands in for a sprite PokéAPI can't serve (moved, offline, or not drawn yet) with its Pokédex number.
+// An image rather than text, so sizing, upside-down negatives and hardcore silhouettes still apply.
+function fallbackSprite(n) {
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" font-family="monospace" text-anchor="middle" fill="#b3c28a">'
+    + '<rect x="20" y="24" width="56" height="48" rx="3" fill="#2c3a1d"/>'
+    + `<text x="48" y="43" font-size="11">No.</text><text x="48" y="62" font-size="17">${String(n).padStart(3, '0')}</text></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
+
 function currentSystem() {
   return document.querySelector('input[name="system"]:checked').value;
 }
@@ -35,6 +44,7 @@ function element(tag, className, text) {
 function digit(n) {
   const name = (n === 0 ? MISSINGNO : pokemon[n - 1])[lang];
   const img = element('img');
+  img.addEventListener('error', () => { img.src = fallbackSprite(n); }, { once: true });
   img.src = spriteUrl(n);
   img.alt = name;
   img.width = img.height = 96;
