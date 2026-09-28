@@ -155,6 +155,11 @@ var {
   .readout--date {
     --sprite: 52px;
   }
+
+  /* So that "1 + 1 = 2" fits on one row. */
+  .readout--convert:has(> .operator) {
+    --sprite: 64px;
+  }
 }
 
 .readout--convert:not([data-system="pokemon"]) {
@@ -178,6 +183,15 @@ var {
   align-self: flex-start;
   margin-top: calc(var(--sprite) * 0.42 - 0.5em);
   font-size: calc(var(--sprite) * 0.35);
+}
+
+/* In a sum, digits hug and operators get room, so each number reads as one group. */
+.readout--convert .operator {
+  padding-inline: 0.4em;
+}
+
+.readout--convert:has(> .operator) .digit img {
+  margin-inline: calc(var(--sprite) * -0.14);
 }
 
 .digit {

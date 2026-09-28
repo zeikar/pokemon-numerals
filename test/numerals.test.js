@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { toDigits, parseInteger } from '../numerals.js';
+import { toDigits, parseInteger, parseExpression } from '../numerals.js';
 
 const BASE = 1026n;
 
@@ -39,5 +39,32 @@ test('parseInteger accepts whole numbers', () => {
 test('parseInteger rejects everything else', () => {
   for (const input of ['', ' ', '1.5', '1e3', 'abc', '--1', '0x10']) {
     assert.equal(parseInteger(input), null, input);
+  }
+});
+
+test('parseExpression adds and subtracts', () => {
+  assert.deepEqual(parseExpression('1 + 1'), { left: 1n, operator: '+', right: 1n, result: 2n });
+  assert.deepEqual(parseExpression('25-30'), { left: 25n, operator: '-', right: 30n, result: -5n });
+  assert.equal(parseExpression(' -7 + 3 ').result, -4n);
+  assert.equal(parseExpression('1 - -1').result, 2n);
+  assert.equal(parseExpression('5 \u2212 \u22127').result, 12n); // the minus sign the page itself displays
+});
+
+test('sums carry and borrow in the base', () => {
+  assert.deepEqual(toDigits(parseExpression('1 + 1').result, BASE), [2]); // Bulbasaur + Bulbasaur = Ivysaur
+  assert.deepEqual(toDigits(parseExpression('1025 + 1').result, BASE), [1, 0]);
+  assert.deepEqual(toDigits(parseExpression('1026 - 1').result, BASE), [1025]);
+  assert.deepEqual(toDigits(parseExpression('151 + 1').result, 152n), [1, 0]); // Gen 1
+});
+
+test('sums of large values stay exact', () => {
+  const a = 123456789012345678901234567890n;
+  assert.equal(parseExpression(`${a} + ${a}`).result, 2n * a);
+  assert.equal(parseExpression(`${a} - ${a + 1n}`).result, -1n);
+});
+
+test('parseExpression rejects everything else', () => {
+  for (const input of ['', '42', '-7', '1 +', '+ 1', '1 + 1 + 1', '1 * 2', '1.5 + 1', '1 ++ 1', 'a + b']) {
+    assert.equal(parseExpression(input), null, input);
   }
 });

@@ -1,4 +1,4 @@
-import { toDigits, parseInteger } from './numerals.js';
+import { toDigits, parseInteger, parseExpression } from './numerals.js';
 
 const MISSINGNO = { en: 'MissingNo.', ko: 'MissingNo.' };
 const lang = navigator.language.toLowerCase().startsWith('ko') ? 'ko' : 'en';
@@ -108,10 +108,18 @@ function tick() {
   setTimeout(tick, 1000 - (Date.now() % 1000));
 }
 
-function formula(value, digits, negative) {
-  const el = element('span', 'formula');
-  const sign = negative ? '−' : '';
-  el.append(`${sign}${value} = ${sign}${negative ? '(' : ''}`);
+// A signed BigInt in decimal, with the minus sign the page displays.
+function decimal(n) {
+  return n < 0n ? `−${-n}` : String(n);
+}
+
+// `prefix` then "n = d × base^k + …", or just "n" when it is a single digit.
+function formula(n, prefix = '') {
+  const negative = n < 0n;
+  const digits = toDigits(negative ? -n : n, base);
+  const el = element('span', 'formula', `${prefix}${decimal(n)}`);
+  if (digits.length === 1) return el;
+  el.append(` = ${negative ? '−(' : ''}`);
   digits.forEach((d, i) => {
     el.append(`${i > 0 ? ' + ' : ''}${d} × ${base}`, element('sup', '', String(digits.length - 1 - i)));
   });
@@ -119,22 +127,9 @@ function formula(value, digits, negative) {
   return el;
 }
 
-function renderConverter() {
-  const system = currentSystem();
-  const text = input.value;
-  const n = parseInteger(text);
-  convertedEl.dataset.system = system;
-  noteEl.replaceChildren();
-
-  if (n === null) {
-    convertedEl.replaceChildren();
-    if (text.trim()) noteEl.textContent = 'Enter a whole number, like 25 or -7.';
-    return;
-  }
-
+function signedNumeral(n, system) {
   const negative = n < 0n;
-  const value = negative ? -n : n;
-  const el = numeral(value, system);
+  const el = numeral(negative ? -n : n, system);
   if (negative && system === 'pokemon') {
     // Pokémon Numerals write negatives upside down instead of with a sign.
     el.classList.add('negative');
@@ -142,10 +137,38 @@ function renderConverter() {
   } else if (negative) {
     el.prepend(element('span', 'separator', '−')); // inside the numeral so the sign wraps with it
   }
-  convertedEl.replaceChildren(el);
+  return el;
+}
 
-  const digits = toDigits(value, base);
-  if (system === 'pokemon' && digits.length > 1) noteEl.append(formula(value, digits, negative));
+function renderConverter() {
+  const system = currentSystem();
+  const text = input.value;
+  const expression = parseExpression(text);
+  convertedEl.dataset.system = system;
+  noteEl.replaceChildren();
+
+  if (expression) {
+    const { left, operator, right, result } = expression;
+    const symbol = operator === '+' ? '+' : '−';
+    // Not separator(): unlike the clock's colons, these should be read out.
+    convertedEl.replaceChildren(
+      signedNumeral(left, system), element('span', 'separator operator', symbol),
+      signedNumeral(right, system), element('span', 'separator operator', '='),
+      signedNumeral(result, system),
+    );
+    if (system === 'pokemon') noteEl.append(formula(result, `${decimal(left)} ${symbol} ${decimal(right)} = `));
+    return;
+  }
+
+  const n = parseInteger(text);
+  if (n === null) {
+    convertedEl.replaceChildren();
+    if (text.trim()) noteEl.textContent = 'Enter a whole number, like 25 or -7, or a sum, like 1 + 1.';
+    return;
+  }
+
+  convertedEl.replaceChildren(signedNumeral(n, system));
+  if (system === 'pokemon' && (n < 0n ? -n : n) >= base) noteEl.append(formula(n));
 }
 
 // Each generation counts in base (its last Pokédex number + 1).
